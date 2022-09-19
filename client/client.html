@@ -29,7 +29,7 @@
           statusHeading.innerHTML = "<b>Not Implemented</b>";
           break;
         case 404: 
-          statusHeading.innerHTML = "<b>Not Found</b>";
+          statusHeading.innerHTML = "<b>Resource Not Found</b>";
           break;
         default:
           statusHeading.innerHTML = "<b>Error</b>";
@@ -48,7 +48,7 @@
         const parsedContent = JSON.parse(resText);
         console.dir(parsedContent);
         resolveStatus(response.status);
-        messageParagraph.innerHTML = parsedContent.message;
+        messageParagraph.innerHTML = "Message: " + parsedContent.message;
         content.appendChild(statusHeading);
         content.appendChild(messageParagraph);
       }
@@ -56,7 +56,7 @@
         const parsedContent = new window.DOMParser().parseFromString(resText, 'text/xml');
         console.log(parsedContent);
         resolveStatus(response.status);
-        messageParagraph.innerHTML = parsedContent.querySelector('message').textContent;
+        messageParagraph.innerHTML = "Message: " + parsedContent.querySelector('message').textContent;
         content.appendChild(statusHeading);
         content.appendChild(messageParagraph);
       }
