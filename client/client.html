@@ -5,7 +5,86 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script>
+    const statusHeading = document.createElement('h1');
+    const messageParagraph = document.createElement('p');
 
+    const resolveStatus = (status) => {
+      switch(status) {
+        case 200: 
+          statusHeading.innerHTML = "<b>Success</b>";
+          break;
+        case 400: 
+          statusHeading.innerHTML = "<b>Bad Request</b>";
+          break;
+        case 401: 
+          statusHeading.innerHTML = "<b>Unauthorized</b>";
+          break;
+        case 403: 
+          statusHeading.innerHTML = "<b>Forbidden</b>";
+          break;
+        case 500: 
+          statusHeading.innerHTML = "<b>Internal Server Error</b>";
+          break;
+        case 501: 
+          statusHeading.innerHTML = "<b>Not Implemented</b>";
+          break;
+        case 404: 
+          statusHeading.innerHTML = "<b>Not Found</b>";
+          break;
+        default:
+          statusHeading.innerHTML = "<b>Error</b>";
+          break;
+      }
+    }
+
+    const handleResponse = async (response) => {
+      resText = await response.text();
+      let content = document.querySelector('#content');
+      const contentType = response.headers.get('Content-Type');
+
+      content.innerHTML = "";
+
+      if (contentType === 'application/json') {
+        const parsedContent = JSON.parse(resText);
+        console.dir(parsedContent);
+        resolveStatus(response.status);
+        messageParagraph.innerHTML = parsedContent.message;
+        content.appendChild(statusHeading);
+        content.appendChild(messageParagraph);
+      }
+      else if (contentType === 'text/xml') {
+        const parsedContent = new window.DOMParser().parseFromString(resText, 'text/xml');
+        console.log(parsedContent);
+        resolveStatus(response.status);
+        messageParagraph.innerHTML = parsedContent.querySelector('message').textContent;
+        content.appendChild(statusHeading);
+        content.appendChild(messageParagraph);
+      }
+    };
+
+    const sendFetchRequest = async (url, acceptedType) => {
+      const options = {
+        method: 'GET',
+        headers: {
+          'Accept': acceptedType
+        }
+      }
+
+      const response = await fetch(url, options);
+      handleResponse(response);
+    };
+
+    const init = () => {
+      document.querySelector('#content').innerHTML = "Awaiting user action...";
+      
+      const statusSelector = document.querySelector("#page");
+      const typeSelector = document.querySelector("#type");
+      const sendButton = document.querySelector("#send");
+
+      sendButton.addEventListener('click', () => sendFetchRequest(statusSelector.value, typeSelector.value));
+    }
+
+    window.onload = init;
   </script>
 </head>
 <body>
